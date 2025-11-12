@@ -1,0 +1,47 @@
+/* Custom Styles */
+body {
+  font-family: 'Inter', sans-serif, system-ui;
+}
+.form-section {
+  display: none; /* Hide all sections by default */
+}
+.form-section.active {
+  display: block; /* Show only the active section */
+}
+.modal {
+  display: none; /* Hidden by default */
+}
+.modal.active {
+  display: flex; /* Show when active */
+}
+/* Simple loading spinner */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Modal sizing for Edit/View Form */
+.modal-body-form {
+  max-height: 80vh; /* Allow modal to be tall */
+  overflow-y: auto;
+}
+
+/* Logic to resize modal for View vs Edit vs Download */
+
+/* Standard width for Info, Error, and Download Preview */
+.modal-view .modal-content {
+    max-width: 600px;
+}
+
+/* Wide width for full forms (View and Edit) */
+.modal-edit .modal-content {
+   width: 95%; /* Use more width */
+   max-width: 900px; /* Max width for large forms */
+}
