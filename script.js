@@ -28,11 +28,6 @@ import {
 // This code will FAIL until you complete the Netlify steps.
 const firebaseConfig = JSON.parse(__firebase_config);
 const appId = __app_id;
-// --- Config ---
-// These variables will be securely injected by Netlify.
-// This code will FAIL until you complete the Netlify steps.
-const firebaseConfig = JSON.parse(__firebase_config);
-const appId = __app_id;
 
 // --- Global State ---
 let G = {
