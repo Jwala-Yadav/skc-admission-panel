@@ -28,9 +28,11 @@ import {
 // This code will FAIL until you complete the Netlify steps.
 const firebaseConfig = JSON.parse(__firebase_config);
 const appId = __app_id;
-// This is used for Firebase collection paths.
-// If you are not using the __app_id__ variable, you can change this.
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+// --- Config ---
+// These variables will be securely injected by Netlify.
+// This code will FAIL until you complete the Netlify steps.
+const firebaseConfig = JSON.parse(__firebase_config);
+const appId = __app_id;
 
 // --- Global State ---
 let G = {
