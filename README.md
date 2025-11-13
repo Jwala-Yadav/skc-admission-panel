@@ -6,22 +6,6 @@ A modern, responsive web application for managing student enquiries across multi
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Form Types](#form-types)
-- [Technology Stack](#technology-stack)
-- [Security](#security)
-- [Browser Support](#browser-support)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-
----
-
 ## ✨ Features
 
 ### Student Forms
@@ -44,7 +28,8 @@ A modern, responsive web application for managing student enquiries across multi
 - 📋 Enquiry data management
 - 🔍 Search and filter functionality
 - 📥 Download enquiry details (PDF format)
-- 📈 View all submitted enquiries
+- 🔐 Secure backend powered by Google Firebase (Auth & Firestore)
+-  View all submitted enquiries
 
 ### User Experience
 - 📱 Fully responsive design (Mobile, Tablet, Desktop)
@@ -52,6 +37,26 @@ A modern, responsive web application for managing student enquiries across multi
 - ⚡ Fast loading and smooth navigation
 - 🔒 Code inspection disabled for security
 - 🖨️ Print-friendly success pages
+
+---
+
+### 📸 Screenshots
+Front-End
+<img width="1920" height="1401" alt="screencapture-skcadmission-netlify-app-2025-11-12-22_58_43" src="https://github.com/user-attachments/assets/3f451990-00c3-49cb-97ba-7bfeb116d11c" />
+
+<img width="1920" height="3211" alt="screencapture-skcadmission-netlify-app-2025-11-12-22_58_56" src="https://github.com/user-attachments/assets/18a58133-3aae-4937-92ea-2a33f4e33b3b" />
+
+<img width="1920" height="3663" alt="screencapture-skcadmission-netlify-app-2025-11-12-22_59_09" src="https://github.com/user-attachments/assets/90af264d-9833-4017-9399-c4366185d954" />
+
+
+Back-End
+<img width="1920" height="1012" alt="screencapture-skcadmission-netlify-app-2025-11-12-22_59_48" src="https://github.com/user-attachments/assets/8b108d6e-e533-483a-9654-0ec5a3ec37a2" />
+
+<img width="1920" height="2412" alt="screencapture-skcadmission-netlify-app-2025-11-13-17_05_32" src="https://github.com/user-attachments/assets/8cc7e59a-7846-4517-b771-5543cb4ffcde" />
+
+Analytics View
+<img width="1920" height="1243" alt="screencapture-skcadmission-netlify-app-2025-11-13-17_05_19" src="https://github.com/user-attachments/assets/e93560bd-0cc5-43bc-8717-72cbc6474b00" />
+
 
 ---
 
@@ -63,7 +68,7 @@ SKC_Admissionpannel/
 ├── script.js               # Core JavaScript logic (module)
 ├── style.css               # Custom CSS styles
 ├── assets/
-│   └── SKC Logo.png        # Institution logo
+│   └── skc-logo.png        # Institution logo
 ├── README.md               # This file
 └── .gitignore              # Git ignore rules
 ```
@@ -74,15 +79,15 @@ SKC_Admissionpannel/
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- No backend server required (static HTML/CSS/JS)
-- Internet connection for CDN libraries
+- A configured Google Firebase project for backend functionality
+- Internet connection for CDN libraries and Firebase services
 
 ### Steps
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/SKC_Admissionpannel.git
-   cd SKC_Admissionpannel
+   git remote add origin https://github.com/Jwala-Yadav/skc-admission-panel.git
+   cd skc-admission-panel
    ```
 
 2. **Open in browser**
@@ -177,7 +182,7 @@ SKC_Admissionpannel/
 | **Icons** | SVG (inline) |
 | **Libraries** | html2canvas, xlsx, jsPDF |
 | **Security** | Client-side DevTools blocking |
-| **Backend** | Firebase (optional - for data storage) |
+| **Backend** | Google Firebase (Authentication & Firestore Database) |
 
 ### CDN Libraries Used
 - Tailwind CSS: `https://cdn.tailwindcss.com`
@@ -298,6 +303,8 @@ For feature requests or bug reports, please contact the development team.
 
 **Last Updated**: November 12, 2025
 
-**👨‍💻 Author**
-Developed by Jwala Yadav
-Portfolio: jwala-yadav.netlify.app
+### 👨‍💻 Developed by
+
+* **Jwala Yadav**
+* **Portfolio:** [jwalayadav-portfolio.netlify.app](https://jwala-yadav.netlify.app)
+* **GitHub:** [Jwala-Yadav](https://github.com/Jwala-Yadav)

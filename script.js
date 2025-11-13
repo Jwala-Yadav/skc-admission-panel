@@ -28,11 +28,6 @@ import {
 // This code will FAIL until you complete the Netlify steps.
 const firebaseConfig = JSON.parse(__firebase_config);
 const appId = __app_id;
-// --- Config ---
-// These variables will be securely injected by Netlify.
-// This code will FAIL until you complete the Netlify steps.
-const firebaseConfig = JSON.parse(__firebase_config);
-const appId = __app_id;
 
 // --- Global State ---
 let G = {
@@ -797,18 +792,21 @@ function getFormData(form) {
   // --- END FIX ---
 
   // Handle mobile numbers with WhatsApp checkbox
-  const studentMobile = data.studentMobile;
-  const fatherMobile = data.fatherMobile;
-  const motherMobile = data.motherMobile;
+  // Use a safe getter to avoid errors if data is missing
+  const get = (key) => data[key] || undefined;
+
+  const studentMobile = get('studentMobile');
+  const fatherMobile = get('fatherMobile');
+  const motherMobile = get('motherMobile');
 
   data.studentMobile = {
     number: studentMobile || '',
-    isWhatsapp: !!data['studentMobile-whatsapp']
+    isWhatsapp: !!get('studentMobile-whatsapp')
   };
 
   data.fatherMobile = {
     number: fatherMobile || '',
-    isWhatsapp: !!data['fatherMobile-whatsapp']
+    isWhatsapp: !!get('fatherMobile-whatsapp')
   };
 
   data.motherMobile = {
@@ -819,13 +817,13 @@ function getFormData(form) {
   // Handle parent info
   data.parentInfo = {
     father: {
-      name: data.fatherName || '',
-      occupation: data.fatherOccupation || '',
+      name: get('fatherName') || '',
+      occupation: get('fatherOccupation') || '',
       mobile: data.fatherMobile
     },
     mother: {
-      name: data.motherName || '',
-      occupation: data.motherOccupation || '',
+      name: get('motherName') || '',
+      occupation: get('motherOccupation') || '',
       mobile: data.motherMobile
     }
   };
@@ -833,10 +831,10 @@ function getFormData(form) {
   // Handle address
   data.residentialAddress = {
     line: data.residentialAddressLine || '',
-    city: data.residentialAddressCity || '',
-    state: data.residentialAddressState || '',
-    pincode: data.residentialAddressPincode || '',
-    landmark: data.residentialAddressLandmark || ''
+    city: get('residentialAddressCity') || '',
+    state: get('residentialAddressState') || '',
+    pincode: get('residentialAddressPincode') || '',
+    landmark: get('residentialAddressLandmark') || ''
   };
 
   // Clean undefined values
@@ -991,18 +989,18 @@ function renderAdminTable() {
     
     return `
     <tr class="hover:bg-gray-50">
-      <td class="px-6 py-4 text-sm font-medium text-blue-600">${enq.tokenization || 'N/A'}</td>
-      <td class="px-6 py-4 text-sm text-gray-800">${enq.studentName || 'N/A'}</td>
-      <td class="px-6 py-4 text-sm text-gray-600">${enq.formType || 'N/A'}</td>
-      <td class="px-6 py-4 text-sm text-gray-600">${enq.submittedAt ? new Date(enq.submittedAt.seconds * 1000).toLocaleString() : 'N/A'}</td>
-      <td class="px-6 py-4 text-sm ${statusColor}">
+      <td data-label="Token ID" class="px-6 py-4 text-sm font-medium text-blue-600">${enq.tokenization || 'N/A'}</td>
+      <td data-label="Student Name" class="px-6 py-4 text-sm text-gray-800">${enq.studentName || 'N/A'}</td>
+      <td data-label="Form Type" class="px-6 py-4 text-sm text-gray-600">${enq.formType || 'N/A'}</td>
+      <td data-label="Submission Date" class="px-6 py-4 text-sm text-gray-600">${enq.submittedAt ? new Date(enq.submittedAt.seconds * 1000).toLocaleString() : 'N/A'}</td>
+      <td data-label="Status" class="px-6 py-4 text-sm ${statusColor}">
         <select class="admin-status-select w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${statusColor}" data-id="${enq.id}">
           <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
           <option value="Granted" ${status === 'Granted' ? 'selected' : ''}>Admission Granted</option>
           <option value="Not Eligible" ${status === 'Not Eligible' ? 'selected' : ''}>Not Eligible</option>
         </select>
       </td>
-      <td class="px-6 py-4 text-sm">
+      <td data-label="Admission Form No." class="px-6 py-4 text-sm">
         <input 
           type="text" 
           class="admin-form-no-input w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
@@ -1011,7 +1009,7 @@ function renderAdminTable() {
           placeholder="Enter form no..."
         />
       </td>
-      <td class="px-6 py-4 text-sm font-medium">
+      <td data-label="Actions" class="px-6 py-4 text-sm font-medium">
         <div class="flex flex-col space-y-1 items-start">
             <button class="admin-view-details text-blue-600 hover:text-blue-800" data-id="${enq.id}" data-form-type="${enq.formType}">View</button>
             <button class="admin-edit-details text-yellow-600 hover:text-yellow-800" data-id="${enq.id}" data-form-type="${enq.formType}">Edit</button>
@@ -2590,3 +2588,155 @@ async function init() {
 
 // Start the application once the DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
+
+/**
+ * Simple HTML escaper to prevent XSS.
+ */
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// --- Admin session idle/logout timer ---
+// Timeout length (ms)
+const ADMIN_IDLE_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes
+
+let __adminIdleTimer = null;
+let __adminCountdownInterval = null;
+let __adminExpiresAt = null;
+
+/**
+ * Start or restart admin idle timer (call after successful login).
+ */
+function startAdminIdleTimer() {
+  stopAdminIdleTimer();
+
+  __adminExpiresAt = Date.now() + ADMIN_IDLE_TIMEOUT_MS;
+  // update UI and start countdown tick
+  updateAdminTimerUI(true);
+  __adminCountdownInterval = setInterval(() => {
+    updateAdminTimerUI();
+  }, 1000);
+
+  // final timeout
+  __adminIdleTimer = setTimeout(() => {
+    adminForceLogout('You were logged out due to 20 minutes of inactivity. Please login again.');
+  }, ADMIN_IDLE_TIMEOUT_MS);
+}
+
+/**
+ * Reset the admin idle timer (call on user activity).
+ */
+function resetAdminIdleTimer() {
+  if (!sessionStorage.getItem('skc_admin_logged_in')) return;
+  startAdminIdleTimer();
+}
+
+/**
+ * Stop/clear the admin idle timer and countdown.
+ */
+function stopAdminIdleTimer() {
+  if (__adminIdleTimer) { clearTimeout(__adminIdleTimer); __adminIdleTimer = null; }
+  if (__adminCountdownInterval) { clearInterval(__adminCountdownInterval); __adminCountdownInterval = null; }
+  __adminExpiresAt = null;
+  updateAdminTimerUI(false); // hide UI
+}
+
+/**
+ * Force logout admin, show message and return to login view.
+ */
+function adminForceLogout(message) {
+  // clear session storage and timers
+  sessionStorage.removeItem('skc_admin_logged_in');
+  sessionStorage.removeItem('skc_admin_user');
+  stopAdminIdleTimer();
+
+  // show modal or alert then show login
+  if (typeof showModal === 'function') {
+    showModal('Signed out', `<p class="text-sm">${escapeHtml(message || 'Session expired. Please login again.')}</p>`);
+  } else {
+    alert(message || 'Session expired. Please login again.');
+  }
+
+  // navigate to login view
+  if (typeof showView === 'function') showView('admin-login-view');
+}
+
+/**
+ * Update timer UI; if `show` is false hide UI.
+ */
+function updateAdminTimerUI(show = true) {
+  const timerWrap = document.getElementById('admin-session-timer');
+  const timerEl = document.getElementById('admin-timer');
+  if (!timerWrap || !timerEl) return;
+  if (!show || !__adminExpiresAt) {
+    timerWrap.classList.add('hidden');
+    return;
+  }
+  const msLeft = Math.max(0, __adminExpiresAt - Date.now());
+  const totalSec = Math.ceil(msLeft / 1000);
+  const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
+  const sec = String(totalSec % 60).padStart(2, '0');
+  timerEl.textContent = `${min}:${sec}`;
+  timerWrap.classList.remove('hidden');
+
+  // if expired, ensure immediate logout
+  if (msLeft <= 0) {
+    adminForceLogout('You were logged out due to inactivity. Please login again.');
+  }
+}
+
+/**
+ * Call this once during app init to wire activity listeners (only resets when admin logged in).
+ */
+function initAdminActivityListeners() {
+  const activityEvents = ['mousemove', 'keydown', 'click', 'touchstart'];
+  activityEvents.forEach(ev => {
+    document.addEventListener(ev, () => {
+      if (sessionStorage.getItem('skc_admin_logged_in')) resetAdminIdleTimer();
+    }, { passive: true });
+  });
+}
+
+// Ensure activity listeners are wired once
+initAdminActivityListeners();
+
+// Integrate with existing login/logout flows:
+// - On successful admin login (where you set sessionStorage skc_admin_logged_in), call startAdminIdleTimer()
+// - On explicit sign out button, call stopAdminIdleTimer() and clear sessionStorage
+// Example integration points below (place these where your login/signout handling exists):
+
+// After successful login (replace existing code that marks admin logged in)
+function onAdminLoggedIn() {
+  sessionStorage.setItem('skc_admin_logged_in', '1');
+  // optionally set user id/email
+  // sessionStorage.setItem('skc_admin_user', adminEmail);
+  startAdminIdleTimer();
+  // show admin main view
+  if (typeof showView === 'function') showView('admin-data-view');
+  // load admin data, etc.
+  if (typeof loadAdminData === 'function') loadAdminData();
+}
+
+// When admin clicks Sign Out button (ensure your button calls this)
+function onAdminSignOutClicked() {
+  sessionStorage.removeItem('skc_admin_logged_in');
+  sessionStorage.removeItem('skc_admin_user');
+  stopAdminIdleTimer();
+  if (typeof showView === 'function') showView('admin-login-view');
+}
+
+// Wire signout button if present
+document.addEventListener('DOMContentLoaded', () => {
+  const sb = document.getElementById('admin-signout-btn');
+  if (sb) sb.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    onAdminSignOutClicked();
+  });
+
+  // If admin already logged in on page load, resume timer
+  if (sessionStorage.getItem('skc_admin_logged_in')) {
+    startAdminIdleTimer();
+  }
+});
