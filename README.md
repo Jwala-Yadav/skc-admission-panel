@@ -52,6 +52,10 @@ Front-End
 Back-End
 <img width="1920" height="1012" alt="screencapture-skcadmission-netlify-app-2025-11-12-22_59_48" src="https://github.com/user-attachments/assets/8b108d6e-e533-483a-9654-0ec5a3ec37a2" />
 
+<img width="1920" height="2412" alt="screencapture-skcadmission-netlify-app-2025-11-13-17_05_32" src="https://github.com/user-attachments/assets/8cc7e59a-7846-4517-b771-5543cb4ffcde" />
+
+Analytics View
+<img width="1920" height="1243" alt="screencapture-skcadmission-netlify-app-2025-11-13-17_05_19" src="https://github.com/user-attachments/assets/e93560bd-0cc5-43bc-8717-72cbc6474b00" />
 
 ---
 
